@@ -14,15 +14,15 @@ class Game:
 
     def new(self):
         self.all_sprites = pygame.sprite.Group()
-        self.player = Player()
-        self.all_sprites.add(self.player)
         self.platforms = pygame.sprite.Group()
-        platform1 = Platform(0, HEIGHT-20, WIDTH, 20)
-        platform2 = Platform(50, 300, 300, 20)
-        self.all_sprites.add(platform1)
-        self.platforms.add(platform1)
-        self.all_sprites.add(platform2)
-        self.platforms.add(platform2)
+        self.player = Player(self)
+        self.all_sprites.add(self.player)
+# spawn all the platforms in the platform list (settings)
+        for plat in PLATFORM_LIST:
+            p = Platform(*plat) #"explode" the list
+            self.all_sprites.add(p) #these are sprites
+            self.platforms.add(p) #and they are platforms for collisions
+
         self.run()
 
     def run(self):
@@ -37,8 +37,9 @@ class Game:
         self.all_sprites.update()
         hits = pygame.sprite.spritecollide(self.player, self.platforms, False)
         if hits:
-            self.player.pos.y = hits[0].rect.top
-            self.player.vel.y = 0
+            if self.player.vel.y > 0:
+                self.player.pos.y = hits[0].rect.top
+                self.player.vel.y = 0
 
 
     def events(self):
@@ -47,6 +48,9 @@ class Game:
                 if self.playing:
                     self.playing = False
                 self.running = False
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                     self.player.jump()
 
     def draw(self):
         self.screen.fill(BLACK)

@@ -3,8 +3,9 @@ from settings import *
 vec = pygame.math.Vector2
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self):
+    def __init__(self, game):
         pygame.sprite.Sprite.__init__(self)
+        self.game = game
         self.image = pygame.Surface ((30,40))
         self.image.fill(WHITE)
         self.rect = self.image.get_rect()
@@ -12,10 +13,17 @@ class Player(pygame.sprite.Sprite):
         self.vel = vec(0, 0)
         self.acc = vec(0,0)
 
+    def jump(self):
+        self.rect.x += 1
+        hits = pygame.sprite.spritecollide(self, self.game.platforms, False)
+        self.rect.x -= 1
+        if hits:
+            self.vel.y = -80
 
     def update(self):
-        self.acc = vec(0,0.8)
+        self.acc = vec(0,GRAVITY)
         keys = pygame.key.get_pressed()
+
         if keys[pygame.K_LEFT]:
             if self.pos.x >= 15:
                 self.acc.x = -PLAYER_ACC
@@ -23,6 +31,9 @@ class Player(pygame.sprite.Sprite):
         if keys[pygame.K_RIGHT]:
             if self.pos.x <= WIDTH - 15:
                 self.acc.x = PLAYER_ACC
+
+
+
 
 
 # set the new position with relation to acceleration
